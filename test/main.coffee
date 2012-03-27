@@ -5,34 +5,41 @@ e = require '../index'
 describe 'e', ->
   beforeEach -> e.middleware = []
 
+  it '#() should autopopulate', (done) ->
+    e.use (err) ->
+      should.exist err
+      should.exist err.message
+      err.message.should.equal "NO"
+      should.exist err.fileName
+      err.fileName.should.equal __filename
+      should.exist err.context
+      done()
+    e "NO"
+
   describe 'middleware', ->
     it '#use()', (done) ->
-      e.use (err, file, context) ->
+      e.use (err) ->
         should.exist err
         should.exist err.message
         err.message.should.equal "NO"
-        should.exist file
-        file.should.equal "filename.coffee"
-        should.exist context
+        should.exist err.fileName
+        should.exist err.context
         done()
-      e "NO", "filename.coffee", @
+      e "NO"
 
-  describe '#console', ->
+  describe '#logger()', ->
     it 'should log an error properly', (done) ->
       e.use e.logger './test/test.txt'
       e.use -> done()
       e "NO"
 
-  describe '#logger()', ->
+  ### Screws up mocha
+  describe '#console', ->
     it 'should log an error properly', (done) ->
-      old = console.log
-      console.log = ->
-        done()
-        console.log = old
       e.use e.console
+      e.use -> done()
       e "NO"
 
-  ### Screws up mocha
   describe '#global()', ->
     it 'should handle a global error properly', (done) ->
       e.use -> done()
@@ -41,22 +48,31 @@ describe 'e', ->
 
   describe '#wrap()', ->
     it 'should wrap with an error properly', (done) ->
-      e.use -> done()
-      fn = e.wrap -> throw 'Code reached'
-      fn new Error("NO"), "test"
+      e.use (err) ->
+        should.exist err
+        done()
+      fn = e.wrap -> throw new Error 'Code reached'
+      fn "NO", "test"
 
     it 'should wrap without an error properly', (done) ->
-      e.use -> throw 'Code reached'
-      fn = e.wrap -> done()
+      e.use -> throw new Error 'Code reached'
+      fn = e.wrap (val) ->
+        should.exist val
+        done()
       fn null, "test"
 
   describe '#handle()', ->
     it 'should wrap with an error properly', (done) ->
-      e.use -> done()
-      fn = e.wrap -> done()
-      fn new Error("NO"), "test"
+      fn = e.handle (err, val) ->
+        should.exist err
+        should.exist val
+        done()
+      fn "NO", "test"
 
     it 'should wrap without an error properly', (done) ->
-      e.use -> done()
-      fn = e.wrap -> done()
+      e.use -> throw new Error 'Code reached'
+      fn = e.handle (err, val) ->
+        should.not.exist err
+        should.exist val
+        done()
       fn null, "test"

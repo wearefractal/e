@@ -23,19 +23,19 @@ e = require 'e'
 e.use e.console # log to console
 e.use e.logger '/var/log/errors.log' # log to file
 e.use e.mongo 'mongodb://server.com/errors' # log to database
+e.use (err) ->
+  # Custom error handling here
+  # The error object passed to middleware has been extended
+  console.log err.fileName, err.functionName, err.lineNumber, err.context
 
 # Handle all process errors to prevent crash (not good practice)
 e.global()
 
 # Change the stacktrace frame limit (default: 10)
 e.limit Infinity
-e.use (err, location, context) ->
-  # Custom error handling here
 
 # Throw errors
 e 'Something bad happened' # Pass an error message
-e 'Something bad happened', 'filename.coffee' # Pass location in for more detail
-e 'Something bad happened', 'filename.coffee', @ # Pass location and context for even more detail
 
 # Utilities
 # .wrap will handle an error with e or call your callback
