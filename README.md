@@ -17,7 +17,6 @@
 ## Usage
 
 ```coffee-script
-fs = require 'fs'
 e = require 'e'
 
 # Configure middleware
@@ -36,7 +35,7 @@ e.use (err, location, context) ->
 # Throw errors
 e 'Something bad happened' # Pass an error message
 e 'Something bad happened', 'filename.coffee' # Pass location in for more detail
-e 'Something bad happened, 'filename.coffee', @ # Pass location and context for even more detail
+e 'Something bad happened', 'filename.coffee', @ # Pass location and context for even more detail
 
 # Utilities
 # .wrap will handle an error with e or call your callback
