@@ -52,6 +52,8 @@ e.stack = (err=new Error, callee=arguments.callee) ->
 e.console = (err) ->
   contents = "[#{new Date()}] - #{err.message}"
   contents += " thrown in #{err.fileName}" if err.fileName?
+  contents += "::#{err.functionName}" if err.functionName?
+  contents += ":#{err.lineNumber}" if err.lineNumber?
   contents += "\r\n#{err.stack}"
   console.log contents
 
@@ -62,6 +64,8 @@ e.logger = (file) ->
       contents ?= " -- Error Log -- "
       contents += "\r\n[#{new Date()}] - #{err.message}"
       contents += " thrown in #{err.fileName}" if err.fileName?
+      contents += "::#{err.functionName}" if err.functionName?
+      contents += ":#{err.lineNumber}" if err.lineNumber?
       contents += "\r\n#{err.stack}"
       fs.writeFile file, contents
 

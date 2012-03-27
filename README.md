@@ -35,7 +35,7 @@ e.global()
 e.limit Infinity
 
 # Throw errors
-e 'Something bad happened' # Pass an error message
+e 'Something bad happened'
 
 # Utilities
 # .wrap will handle an error with e or call your callback
