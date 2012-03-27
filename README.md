@@ -1,12 +1,12 @@
 ## Information
 
 <table>
-<tr> 
-<td>Package</td><td>APPNAME</td>
+<tr>
+<td>Package</td><td>e</td>
 </tr>
 <tr>
 <td>Description</td>
-<td>NOTHING HERE YET</td>
+<td>Error management and utilities</td>
 </tr>
 <tr>
 <td>Node Version</td>
@@ -17,12 +17,40 @@
 ## Usage
 
 ```coffee-script
-NOTHING HERE YET
+fs = require 'fs'
+e = require 'e'
+
+# Configure middleware
+e.use e.console # log to console
+e.use e.logger '/var/log/errors.log' # log to file
+e.use e.mongo 'mongodb://server.com/errors' # log to database
+
+# Handle all process errors to prevent crash (not good practice)
+e.global()
+
+# Change the stacktrace frame limit (default: 10)
+e.limit Infinity
+e.use (err, location, context) ->
+  # Custom error handling here
+
+# Throw errors
+e 'Something bad happened' # Pass an error message
+e 'Something bad happened', 'filename.coffee' # Pass location in for more detail
+e 'Something bad happened, 'filename.coffee', @ # Pass location and context for even more detail
+
+# Utilities
+# .wrap will handle an error with e or call your callback
+fs.readFile 'file.txt', e.wrap (contents) ->
+  # do something
+
+# .handle will handle an error with e and call your callback
+fs.readFile 'file.txt', e.handle (err, contents) ->
+  # do something
 ```
 
 ## Examples
 
-You can view further examples in the [example folder.](https://github.com/wearefractal/APPNAME/tree/master/examples)
+You can view further examples in the [example folder.](https://github.com/wearefractal/e/tree/master/examples)
 
 ## LICENSE
 

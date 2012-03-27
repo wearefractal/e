@@ -1,0 +1,12 @@
+
+[Tue Mar 27 2012 00:33:19 GMT-0700 (MST)] - NO
+Error: NO
+    at Context.<anonymous> (/home/contra/Projects/e/test/main.coffee:34:16)
+    at Test.run (/home/contra/Projects/e/node_modules/mocha/lib/runnable.js:143:15)
+    at Runner.runTest (/home/contra/Projects/e/node_modules/mocha/lib/runner.js:272:10)
+    at /home/contra/Projects/e/node_modules/mocha/lib/runner.js:316:12
+    at next (/home/contra/Projects/e/node_modules/mocha/lib/runner.js:199:14)
+    at /home/contra/Projects/e/node_modules/mocha/lib/runner.js:208:7
+    at next (/home/contra/Projects/e/node_modules/mocha/lib/runner.js:157:23)
+    at Array.0 (/home/contra/Projects/e/node_modules/mocha/lib/runner.js:176:5)
+    at EventEmitter._tickCallback (node.js:192:40)
