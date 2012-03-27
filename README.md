@@ -27,6 +27,7 @@ e.use (err) ->
   # Custom error handling here
   # The error object passed to middleware has been extended
   console.log err.fileName, err.functionName, err.lineNumber, err.context
+  console.log err.level, err.levelName
 
 # Handle all process errors to prevent crash (not good practice)
 e.global()
@@ -36,6 +37,7 @@ e.limit Infinity
 
 # Throw errors
 e 'Something bad happened'
+e 'Something REALLY bad happened', 4 # Codes are 0:"DEBUG" 1:"LOW" 2:"NORMAL" 3:"HIGH" 4:"SEVERE"
 
 # Utilities
 # .wrap will handle an error with e or call your callback
