@@ -1,4 +1,4 @@
-e = (err) ->
+e = (err, level=1) ->
   return unless err
   err = new Error err unless err instanceof Error
   stack = e.stack err, arguments.callee
@@ -9,8 +9,11 @@ e = (err) ->
     err.lineNumber = stack[0].getLineNumber()
     err.columnNumber = stack[0].getColumnNumber()
     err.context = stack[0].getThis()
+  err.level = level
+  err.levelName = e.levels[level]
   middle err for middle in e.middleware
 
+e.levels = ["DEBUG", "LOW", "NORMAL", "HIGH", "SEVERE"] # TODO: Make these better
 e.middleware = []
 e.use = (fn) -> e.middleware.push fn
 
@@ -50,7 +53,7 @@ e.stack = (err=new Error, callee=arguments.callee) ->
 
 # Included middleware
 e.console = (err) ->
-  contents = "[#{new Date()}] - #{err.message}"
+  contents = "[#{err.levelName}][#{new Date()}] - #{err.message}"
   contents += " thrown in #{err.fileName}" if err.fileName?
   contents += "::#{err.functionName}" if err.functionName?
   contents += ":#{err.lineNumber}" if err.lineNumber?
@@ -62,7 +65,7 @@ e.logger = (file) ->
     fs = require 'fs'
     fs.readFile file, (_, contents) ->
       contents ?= " -- Error Log -- "
-      contents += "\r\n[#{new Date()}] - #{err.message}"
+      contents += "\r\n[#{err.levelName}][#{new Date()}] - #{err.message}"
       contents += " thrown in #{err.fileName}" if err.fileName?
       contents += "::#{err.functionName}" if err.functionName?
       contents += ":#{err.lineNumber}" if err.lineNumber?
