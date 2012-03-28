@@ -36,8 +36,11 @@ e.global()
 e.limit Infinity
 
 # Throw errors
+e.debug 'some debugging'
+e.low 'not that bad'
 e 'Something bad happened'
-e 'Something REALLY bad happened', 4 # Codes are 0:"DEBUG" 1:"LOW" 2:"NORMAL" 3:"HIGH" 4:"SEVERE"
+e.high 'something pretty bad happened'
+e.severe 'Something REALLY bad happened'
 
 # Utilities
 # .wrap will handle an error with e or call your callback

@@ -1,4 +1,4 @@
-e = (err, level=1) ->
+e = (err, level=2) ->
   return unless err
   err = new Error err unless err instanceof Error
   stack = e.stack err, arguments.callee
@@ -12,6 +12,12 @@ e = (err, level=1) ->
   err.level = level
   err.levelName = e.levels[level]
   middle err for middle in e.middleware
+
+e.debug = (msg) -> e msg, 0
+e.low = (msg) -> e msg, 1
+e.normal = (msg) -> e msg, 2
+e.high = (msg) -> e msg, 3
+e.severe = (msg) -> e msg, 4
 
 e.levels = ["DEBUG", "LOW", "NORMAL", "HIGH", "SEVERE"] # TODO: Make these better
 e.middleware = []
