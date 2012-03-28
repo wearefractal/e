@@ -54,10 +54,11 @@ e.stack = (err=new Error, callee=arguments.callee) ->
 # Included middleware
 e.console = (err) ->
   contents = "[#{err.levelName}][#{new Date()}] - #{err.message}"
-  contents += " thrown in #{err.fileName}" if err.fileName?
-  contents += "::#{err.functionName}" if err.functionName?
-  contents += ":#{err.lineNumber}" if err.lineNumber?
-  contents += "\r\n#{err.stack}"
+  if err.level > 0
+    contents += " thrown in #{err.fileName}" if err.fileName?
+    contents += "::#{err.functionName}" if err.functionName?
+    contents += ":#{err.lineNumber}" if err.lineNumber?
+    contents += "\r\n#{err.stack}"
   console.log contents
 
 e.logger = (file) ->
@@ -66,10 +67,11 @@ e.logger = (file) ->
     fs.readFile file, (_, contents) ->
       contents ?= " -- Error Log -- "
       contents += "\r\n[#{err.levelName}][#{new Date()}] - #{err.message}"
-      contents += " thrown in #{err.fileName}" if err.fileName?
-      contents += "::#{err.functionName}" if err.functionName?
-      contents += ":#{err.lineNumber}" if err.lineNumber?
-      contents += "\r\n#{err.stack}"
+      if err.level > 0
+        contents += " thrown in #{err.fileName}" if err.fileName?
+        contents += "::#{err.functionName}" if err.functionName?
+        contents += ":#{err.lineNumber}" if err.lineNumber?
+        contents += "\r\n#{err.stack}"
       fs.writeFile file, contents
 
 e.mongo = (db) ->
