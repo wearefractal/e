@@ -46,6 +46,24 @@ describe 'e', ->
       throw "NO"
   ###
 
+  describe '#control()', ->
+    it 'should control with an error properly', (done) ->
+      e.use (err) ->
+        console.log err.stack
+      good = (err) ->
+        should.exist err
+        done()
+      fn = e.control good, -> throw new Error 'Code reached'
+      fn "NO", "test"
+
+    it 'should control without an error properly', (done) ->
+      bad = -> throw new Error 'Code reached'
+      e.use bad
+      fn = e.control bad, (val) ->
+        should.exist val
+        done()
+      fn null, "test"
+
   describe '#wrap()', ->
     it 'should wrap with an error properly', (done) ->
       e.use (err) ->

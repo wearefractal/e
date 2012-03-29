@@ -1,7 +1,7 @@
-e = (err, level=2) ->
-  return unless err
+e = (err, level=2, callee=arguments.callee) ->
+  return unless err?
   err = new Error err unless err instanceof Error
-  stack = e.stack err, arguments.callee
+  stack = e.stack callee
   if stack and stack[0]
     #err.frames = stack
     err.fileName = stack[0].getFileName()
@@ -13,11 +13,11 @@ e = (err, level=2) ->
   err.levelName = e.levels[level]
   middle err for middle in e.middleware
 
-e.debug = (msg) -> e msg, 0
-e.low = (msg) -> e msg, 1
-e.normal = (msg) -> e msg, 2
-e.high = (msg) -> e msg, 3
-e.severe = (msg) -> e msg, 4
+e.debug = (msg) -> e msg, 0, arguments.callee
+e.low = (msg) -> e msg, 1, arguments.callee
+e.normal = (msg) -> e msg, 2, arguments.callee
+e.high = (msg) -> e msg, 3, arguments.callee
+e.severe = (msg) -> e msg, 4, arguments.callee
 
 e.levels = ["DEBUG", "LOW", "NORMAL", "HIGH", "SEVERE"] # TODO: Make these better
 e.middleware = []
@@ -26,9 +26,21 @@ e.use = (fn) -> e.middleware.push fn
 # Call error handler if err exists in first arg
 # Call wrapped fn if err doesnt exist
 e.wrap = (fn) ->
+  callee = arguments.callee
   (err, args...) ->
     if err?
-      e err
+      e err, null, callee
+    else
+      fn args...
+    return
+
+# Same as e.wrap but for killing async control flow
+e.control = (cb, fn) ->
+  callee = arguments.callee
+  (err, args...) ->
+    if err?
+      e err, null, callee
+      cb err
     else
       fn args...
     return
@@ -36,8 +48,9 @@ e.wrap = (fn) ->
 # Call error handler if err exists in first arg
 # Call wrapped fn
 e.handle = (fn) ->
+  callee = arguments.callee
   (args...) ->
-    e args[0] if args[0]?
+    e args[0], null, callee if args[0]?
     fn args...
 
 # Change stackTraceLimit - higher = more verbose
@@ -47,13 +60,12 @@ e.limit = (n) -> Error.stackTraceLimit = n
 e.global = -> process.on 'uncaughtException', e
 
 # Grab raw stack frames from V8
-e.stack = (err=new Error, callee=arguments.callee) ->
+e.stack = (callee=arguments.callee) ->
+  stacko = {}
   orig = Error.prepareStackTrace
-  err.originalStack = err.stack
   Error.prepareStackTrace = (_, stack) -> stack
-  Error.captureStackTrace err, callee
-  frames = err.stack
-  err.stack = err.originalStack
+  Error.captureStackTrace stacko, callee
+  frames = stacko.stack
   Error.prepareStackTrace = orig
   return frames
 
@@ -62,8 +74,6 @@ e.console = (err) ->
   contents = "[#{err.levelName}][#{new Date()}] - #{err.message}"
   if err.level > 0
     contents += " thrown in #{err.fileName}" if err.fileName?
-    contents += "::#{err.functionName}" if err.functionName?
-    contents += ":#{err.lineNumber}" if err.lineNumber?
     contents += "\r\n#{err.stack}"
   console.log contents
 
@@ -75,8 +85,6 @@ e.logger = (file) ->
       contents += "\r\n[#{err.levelName}][#{new Date()}] - #{err.message}"
       if err.level > 0
         contents += " thrown in #{err.fileName}" if err.fileName?
-        contents += "::#{err.functionName}" if err.functionName?
-        contents += ":#{err.lineNumber}" if err.lineNumber?
         contents += "\r\n#{err.stack}"
       fs.writeFile file, contents
 
