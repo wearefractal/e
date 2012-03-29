@@ -48,12 +48,11 @@ describe 'e', ->
 
   describe '#control()', ->
     it 'should control with an error properly', (done) ->
-      e.use (err) ->
-        console.log err.stack
       good = (err) ->
         should.exist err
         done()
-      fn = e.control good, -> throw new Error 'Code reached'
+      bad = -> throw new Error 'Code reached'
+      fn = e.control good, bad
       fn "NO", "test"
 
     it 'should control without an error properly', (done) ->

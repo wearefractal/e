@@ -39,8 +39,8 @@ e.control = (cb, fn) ->
   callee = arguments.callee
   (err, args...) ->
     if err?
-      e err, null, callee
       cb err
+      e err, null, callee
     else
       fn args...
     return
