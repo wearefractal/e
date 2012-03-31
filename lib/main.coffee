@@ -1,6 +1,6 @@
 e = (err, level=2, callee=arguments.callee) ->
   return unless err?
-  err = new Error err unless err instanceof Error
+  err = new Error if err.message then err.message else err
   stack = e.stack callee
   if stack and stack[0]
     #err.frames = stack
