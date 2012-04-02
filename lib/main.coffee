@@ -80,13 +80,15 @@ e.console = (err) ->
 e.logger = (file) ->
   (err) ->
     fs = require 'fs'
-    fs.readFile file, (_, contents) ->
-      contents ?= " -- Error Log -- "
-      contents += "\r\n[#{err.levelName}][#{new Date()}] - #{err.message}"
-      if err.level > 0
-        contents += " thrown in #{err.fileName}" if err.fileName?
-        contents += "\r\n#{err.stack}"
-      fs.writeFile file, contents
+    try
+      contents = fs.readFileSync file
+    catch e
+      contents = " -- Error Log -- "
+    contents += "\r\n[#{err.levelName}][#{new Date()}] - #{err.message}"
+    if err.level > 0
+      contents += " thrown in #{err.fileName}" if err.fileName?
+      contents += "\r\n#{err.stack}"
+    fs.writeFileSync file, contents
 
 e.mongo = (db) ->
   (err) ->
