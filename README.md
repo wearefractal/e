@@ -1,3 +1,4 @@
+[![build status](https://secure.travis-ci.org/wearefractal/e.png)](http://travis-ci.org/wearefractal/e)
 ## Information
 
 <table>
